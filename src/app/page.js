@@ -14,15 +14,17 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Modal state
+  // Modal State
   const [selectedIncident, setSelectedIncident] = useState(null);
 
+  // Fetch Live Cyber Incidents (Vercel Cache Fix Included)
   useEffect(() => {
     async function fetchIncidents() {
       setLoading(true);
 
       const res = await fetch(
-        `https://hn.algolia.com/api/v1/search?query=${category}`
+        `https://hn.algolia.com/api/v1/search?query=${category}`,
+        { cache: "no-store" }
       );
 
       const data = await res.json();
@@ -44,6 +46,7 @@ export default function Home() {
     fetchIncidents();
   }, [category]);
 
+  // Search Filter
   const filteredIncidents = incidents.filter((incident) =>
     incident.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -53,8 +56,10 @@ export default function Home() {
       <Navbar />
 
       <div className="flex">
+        {/* Sidebar */}
         <Sidebar />
 
+        {/* Main Dashboard */}
         <main className="flex-1 px-10 py-10 max-w-6xl mx-auto">
           <h1 className="text-4xl font-bold tracking-tight">
             Security Operations Dashboard
@@ -64,6 +69,7 @@ export default function Home() {
             Live incident monitoring with real-time cybersecurity intelligence.
           </p>
 
+          {/* Stats */}
           <div className="mt-12">
             <Stats total={incidents.length} />
           </div>
@@ -79,7 +85,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Category */}
+          {/* Category Filter */}
           <div className="flex gap-3 flex-wrap mb-12">
             {["cybersecurity", "malware", "hacking", "data breach"].map(
               (cat) => (
@@ -98,7 +104,7 @@ export default function Home() {
             )}
           </div>
 
-          {/* Incidents */}
+          {/* Incident Feed */}
           {loading ? (
             <p className="text-gray-400">Loading incidents...</p>
           ) : (
@@ -115,7 +121,7 @@ export default function Home() {
         </main>
       </div>
 
-      {/* Modal */}
+      {/* Modal Popup */}
       <IncidentModal
         incident={selectedIncident}
         onClose={() => setSelectedIncident(null)}
