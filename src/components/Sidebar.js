@@ -22,6 +22,10 @@ export default function Sidebar() {
           Latest CVEs
         </Link>
 
+        <Link href="/saved-cves" className="hover:text-white transition">
+          Saved CVEs
+        </Link>
+
         <p className="hover:text-white transition cursor-pointer">
           Threat Reports
         </p>

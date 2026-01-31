@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function IncidentModal({ incident, onClose }) {
-  const [statusMessage, setStatusMessage] = useState("");
+  const [alreadySaved, setAlreadySaved] = useState(false);
 
-  if (!incident) return null;
+  useEffect(() => {
+    async function checkSaved() {
+      const res = await fetch("/api/reports");
+      const data = await res.json();
+
+      const exists = data.some((r) => r.url === incident.url);
+      setAlreadySaved(exists);
+    }
+
+    if (incident) checkSaved();
+  }, [incident]);
 
   async function handleSaveReport() {
     const res = await fetch("/api/reports", {
@@ -24,13 +34,11 @@ export default function IncidentModal({ incident, onClose }) {
     const data = await res.json();
 
     if (data.success) {
-      setStatusMessage("Report saved successfully");
-    } else {
-      setStatusMessage("This report is already saved");
+      setAlreadySaved(true);
     }
-
-    setTimeout(() => setStatusMessage(""), 3000);
   }
+
+  if (!incident) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
@@ -44,11 +52,7 @@ export default function IncidentModal({ incident, onClose }) {
 
         <h2 className="text-2xl font-bold mb-4">{incident.title}</h2>
 
-        <p className="text-gray-400 mb-2">Reported by: {incident.author}</p>
-
-        <p className="text-gray-500 mb-6">
-          Published: {new Date(incident.date).toDateString()}
-        </p>
+        <p className="text-gray-400 mb-6">Reported by: {incident.author}</p>
 
         <div className="flex gap-4">
           <a
@@ -60,16 +64,17 @@ export default function IncidentModal({ incident, onClose }) {
           </a>
 
           <button
+            disabled={alreadySaved}
             onClick={handleSaveReport}
-            className="bg-gray-900 border border-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition"
+            className={`px-6 py-3 rounded-xl font-semibold transition ${
+              alreadySaved
+                ? "bg-gray-700 cursor-not-allowed"
+                : "bg-gray-900 border border-gray-700 hover:bg-gray-800"
+            }`}
           >
-            Save Report
+            {alreadySaved ? "Saved" : "Save Report"}
           </button>
         </div>
-
-        {statusMessage && (
-          <p className="mt-6 text-sm text-green-400">{statusMessage}</p>
-        )}
       </div>
     </div>
   );
