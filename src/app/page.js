@@ -1,65 +1,125 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
+import Stats from "../components/Stats";
+import IncidentCard from "../components/IncidentCard";
+import IncidentModal from "../components/IncidentModal";
 
 export default function Home() {
+  const [incidents, setIncidents] = useState([]);
+  const [category, setCategory] = useState("cybersecurity");
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Modal state
+  const [selectedIncident, setSelectedIncident] = useState(null);
+
+  useEffect(() => {
+    async function fetchIncidents() {
+      setLoading(true);
+
+      const res = await fetch(
+        `https://hn.algolia.com/api/v1/search?query=${category}`
+      );
+
+      const data = await res.json();
+
+      const results = data.hits
+        .filter((item) => item.title || item.story_title)
+        .slice(0, 15)
+        .map((item) => ({
+          title: item.title || item.story_title,
+          url: item.url || item.story_url,
+          author: item.author,
+          date: item.created_at,
+        }));
+
+      setIncidents(results);
+      setLoading(false);
+    }
+
+    fetchIncidents();
+  }, [category]);
+
+  const filteredIncidents = incidents.filter((incident) =>
+    incident.title.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-gray-900 text-white">
+      <Navbar />
+
+      <div className="flex">
+        <Sidebar />
+
+        <main className="flex-1 px-10 py-10 max-w-6xl mx-auto">
+          <h1 className="text-4xl font-bold tracking-tight">
+            Security Operations Dashboard
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="text-gray-500 text-base mt-2 max-w-xl">
+            Live incident monitoring with real-time cybersecurity intelligence.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+          <div className="mt-12">
+            <Stats total={incidents.length} />
+          </div>
+
+          {/* Search */}
+          <div className="mt-10 mb-8">
+            <input
+              type="text"
+              placeholder="Search incidents, malware reports, breaches..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-2xl bg-gray-950 border border-gray-800 px-5 py-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+          </div>
+
+          {/* Category */}
+          <div className="flex gap-3 flex-wrap mb-12">
+            {["cybersecurity", "malware", "hacking", "data breach"].map(
+              (cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  className={`px-5 py-2 rounded-full text-sm font-medium transition ${
+                    category === cat
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-900 border border-gray-800 text-gray-300 hover:bg-gray-800"
+                  }`}
+                >
+                  {cat.toUpperCase()}
+                </button>
+              )
+            )}
+          </div>
+
+          {/* Incidents */}
+          {loading ? (
+            <p className="text-gray-400">Loading incidents...</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredIncidents.map((incident, index) => (
+                <IncidentCard
+                  key={index}
+                  incident={incident}
+                  onClick={setSelectedIncident}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Modal */}
+      <IncidentModal
+        incident={selectedIncident}
+        onClose={() => setSelectedIncident(null)}
+      />
     </div>
   );
 }
