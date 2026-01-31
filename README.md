@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# CyberFeed SOC Dashboard
 
-## Getting Started
+CyberFeed is an enterprise-style **Security Operations Center Dashboard** built using **Next.js** and **Tailwind CSS**.
 
-First, run the development server:
+It provides real-time cybersecurity incident monitoring with a modern SaaS UI, category filters, search functionality, icons, and modal-based report previews.
+
+---
+
+## Live Demo
+
+🚀 Deployed on Vercel:  
+https://cyberfeed-dashboard.vercel.app
+
+---
+
+## GitHub Repository
+
+Source Code:  
+https://github.com/Maravind1289/cyberfeed-dashboard
+
+---
+
+## Features
+
+- Enterprise SOC Dashboard UI (Modern SaaS Design)
+- Real-time Cybersecurity Incident Feed (REST API Integration)
+- Category Filtering (Cybersecurity, Malware, Hacking, Data Breach)
+- Search Functionality for Quick Incident Lookup
+- Modal Popup for Incident Details Preview
+- Responsive Sidebar Navigation
+- Professional Icon System using Lucide React
+- Deployed Live with Vercel
+
+---
+
+## Tech Stack
+
+- Next.js (App Router)
+- Tailwind CSS
+- Lucide React Icons
+- HackerNews Algolia REST API
+- Vercel Deployment
+
+---
+
+## Installation & Setup
+
+Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone https://github.com/Maravind1289/cyberfeed-dashboard.git
