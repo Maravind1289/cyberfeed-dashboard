@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -9,16 +10,21 @@ import IncidentCard from "../components/IncidentCard";
 import IncidentModal from "../components/IncidentModal";
 
 export default function Home() {
+  // ✅ Session Hook
+  const { data: session, status } = useSession();
+
+  // ✅ ALL Hooks must always run first
   const [incidents, setIncidents] = useState([]);
   const [category, setCategory] = useState("cybersecurity");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Modal State
   const [selectedIncident, setSelectedIncident] = useState(null);
 
-  // Fetch Live Cyber Incidents (Vercel Cache Fix Included)
+  // ✅ Fetch incidents only if logged in
   useEffect(() => {
+    if (!session) return;
+
     async function fetchIncidents() {
       setLoading(true);
 
@@ -44,9 +50,24 @@ export default function Home() {
     }
 
     fetchIncidents();
-  }, [category]);
+  }, [category, session]);
 
-  // Search Filter
+  // ✅ Loading screen while session loads
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-black text-white">
+        <h1 className="text-xl font-semibold">Loading Dashboard...</h1>
+      </div>
+    );
+  }
+
+  // ✅ Redirect if not logged in
+  if (!session) {
+    window.location.href = "/login";
+    return null;
+  }
+
+  // ✅ Search Filter
   const filteredIncidents = incidents.filter((incident) =>
     incident.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -56,10 +77,8 @@ export default function Home() {
       <Navbar />
 
       <div className="flex">
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Dashboard */}
         <main className="flex-1 px-10 py-10 max-w-6xl mx-auto">
           <h1 className="text-4xl font-bold tracking-tight">
             Security Operations Dashboard
@@ -121,7 +140,7 @@ export default function Home() {
         </main>
       </div>
 
-      {/* Modal Popup */}
+      {/* Modal */}
       <IncidentModal
         incident={selectedIncident}
         onClose={() => setSelectedIncident(null)}
